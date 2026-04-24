@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ensemble · Phone</title>
+<meta name="description" content="Phone cheat sheet for triggering Ensemble autopilot sessions via Termius + Tailscale." />
+<meta name="theme-color" content="#faf7f2" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0f0d0a" media="(prefers-color-scheme: dark)" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg:         #faf7f2;
+    --bg-raised:  #ffffff;
+    --bg-sunken:  #f2ede2;
+    --ink:        #18150f;
+    --ink-2:      #3c362c;
+    --ink-3:      #6e6657;
+    --ink-4:      #a8a193;
+    --rule:       #e8e1d2;
+    --rule-2:     #f0ead9;
+    --accent:     #c2711f;
+    --accent-2:   #e08a2c;
+    --accent-3:   #f3c07a;
+    --accent-ink: #3a1f04;
+    --danger:     #c73a2a;
+    --danger-bg:  #fff4f2;
+    --mono-bg:    #f7f2e7;
+
+    --serif: "Fraunces", ui-serif, Georgia, serif;
+    --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --maxw: 820px;
+    --gutter: clamp(18px, 4vw, 32px);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:         #0f0d0a;
+      --bg-raised:  #1a1711;
+      --bg-sunken:  #141109;
+      --ink:        #f3ecdd;
+      --ink-2:      #d6cdb9;
+      --ink-3:      #9a9078;
+      --ink-4:      #5e564a;
+      --rule:       #2a251c;
+      --rule-2:     #1f1a13;
+      --accent:     #f0a94d;
+      --accent-2:   #ffc073;
+      --accent-3:   #7a4a16;
+      --accent-ink: #1a0d02;
+      --danger:     #ef6a5c;
+      --danger-bg:  #2a120f;
+      --mono-bg:    #100d07;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* Hero */
+  .hero {
+    padding: clamp(40px, 10vw, 80px) 0 clamp(28px, 7vw, 52px);
+    position: relative; overflow: hidden;
+  }
+  .stage-light {
+    position: absolute; inset: -20% -20% auto auto;
+    width: min(700px, 110vw); height: min(700px, 110vw);
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
+    pointer-events: none; z-index: 0;
+    animation: drift 20s var(--ease) infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(-6%, 3%) scale(1.05); }
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 18px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--accent); display: inline-block; }
+  h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(38px, 8vw, 62px);
+    line-height: 1.02; letter-spacing: -.025em;
+    margin: 0 0 18px;
+    color: var(--ink);
+  }
+  h1 em { font-style: italic; color: var(--accent); font-variation-settings: "opsz" 144; }
+  .lead {
+    font-size: clamp(16px, 3.2vw, 19px);
+    color: var(--ink-2); max-width: 44ch;
+    margin: 0 0 24px;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: center;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-3);
+  }
+  .meta .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); animation: pulse 3.2s var(--ease) infinite; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+    70%  { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+    100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+  }
+
+  /* Sections */
+  section { padding: clamp(30px, 6vw, 52px) 0; border-top: 1px solid var(--rule); }
+  h2 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: clamp(22px, 4.4vw, 30px);
+    line-height: 1.15; letter-spacing: -.015em;
+    margin: 0 0 12px;
+  }
+  h2 + p.lead { margin-top: 4px; margin-bottom: 22px; }
+  h3 {
+    font-family: var(--sans); font-weight: 600;
+    font-size: 16px; letter-spacing: -.003em;
+    margin: 0 0 6px;
+  }
+  p { margin: 0 0 12px; color: var(--ink-2); }
+  code, kbd { font-family: var(--mono); font-size: .9em; background: var(--rule-2); padding: .1em .4em; border-radius: 5px; color: var(--ink-2); }
+
+  /* Numbered steps */
+  .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+  .steps li {
+    counter-increment: s;
+    display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: start;
+    font-size: 15px; color: var(--ink-2);
+  }
+  .steps li::before {
+    content: counter(s);
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 20px; line-height: 1.3;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  /* Snippet card */
+  .snip {
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 0 0 14px;
+    transition: border-color .2s var(--ease), transform .2s var(--ease);
+  }
+  .snip:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--rule)); }
+  .snip-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .snip-title { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -.005em; }
+  .snip-title .bullet { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 9px; vertical-align: middle; transform: translateY(-1px); }
+  .snip-tag { font-family: var(--mono); font-size: 11.5px; color: var(--accent); letter-spacing: .02em; }
+  .snip-desc { font-size: 14px; color: var(--ink-3); margin: 6px 0 10px; line-height: 1.5; }
+  .snip-cmd-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: stretch; }
+  .snip-cmd {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.5;
+    background: var(--mono-bg); color: var(--accent-ink);
+    border: 1px solid var(--rule); border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    white-space: pre-wrap; word-break: break-all;
+    user-select: all;
+    margin: 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .snip-cmd { color: var(--accent-2); }
+  }
+  .snip-copy {
+    appearance: none; border: 1px solid var(--rule); background: var(--bg-raised);
+    color: var(--ink-2); font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+    padding: 0 14px; border-radius: var(--radius-sm); cursor: pointer;
+    transition: all .18s var(--ease);
+    min-width: 78px;
+    letter-spacing: .01em;
+  }
+  .snip-copy:hover { color: var(--accent); border-color: var(--accent); }
+  .snip-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .snip-copy.ok { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg-raised)); }
+
+  /* Kill snippet variant */
+  .snip.kill { border-color: color-mix(in srgb, var(--danger) 40%, var(--rule)); background: var(--danger-bg); }
+  .snip.kill .snip-title { color: var(--danger); }
+  .snip.kill .snip-title .bullet { background: var(--danger); }
+  .snip.kill .snip-tag { color: var(--danger); }
+  .snip.kill .snip-cmd { background: color-mix(in srgb, var(--danger) 8%, var(--mono-bg)); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 25%, var(--rule)); }
+  .snip.kill .snip-copy:hover,
+  .snip.kill .snip-copy.ok { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--bg-raised)); }
+
+  /* Safety table */
+  table.rules { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.rules th { text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding: 0 12px 8px 0; border-bottom: 1px solid var(--rule); }
+  table.rules td { padding: 10px 12px 10px 0; vertical-align: top; border-bottom: 1px solid var(--rule); color: var(--ink-2); }
+  table.rules td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; padding-right: 20px; }
+  table.rules tr:last-child td { border-bottom: none; }
+
+  /* Footer */
+  footer { padding: 38px 0 60px; border-top: 1px solid var(--rule); }
+  footer p { margin: 0; font-size: 13px; color: var(--ink-3); line-height: 1.7; }
+  footer a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  footer a:hover { border-bottom-color: currentColor; }
+
+  .callout {
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-raised));
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 14px; color: var(--ink-2); margin: 16px 0 4px;
+  }
+
+  /* Live notice pill after copy */
+  .copy-live { position: fixed; inset: auto 0 26px 0; display: flex; justify-content: center; pointer-events: none; z-index: 100; }
+  .copy-live.show .pill { transform: translateY(0); opacity: 1; }
+  .copy-live .pill {
+    background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 500;
+    padding: 9px 16px; border-radius: 999px;
+    transform: translateY(30px); opacity: 0;
+    transition: transform .28s var(--ease), opacity .28s var(--ease);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--ink) 30%, transparent);
+    font-family: var(--sans);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="stage-light" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <p class="eyebrow">Phone Dispatch</p>
+    <h1>Ensemble <em>·</em> Phone</h1>
+    <p class="lead">Fire autopilot missions from your phone via Termius over Tailscale. Your Mac does the work; your phone is the trigger.</p>
+    <div class="meta">
+      <span><span class="dot" aria-hidden="true"></span> host <code>100.107.120.85</code></span>
+      <span>user <code>kevin</code></span>
+      <span>port <code>22</code></span>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2>Each snippet is one SSH command.</h2>
+    <p class="lead">Termius fires it at your Mac's Tailscale IP. The Mac spawns a detached autopilot session, logs progress to <code>~/.claude/orchestrator/runs/</code>, and fires a macOS notification when done. <strong>Never pushes.</strong> Commits locally with <code>[autopilot]</code> prefix.</p>
+    <p>Mac stays reachable as long as Amphetamine (or equivalent) keeps it awake with the lid closed.</p>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="wrap">
+    <p class="eyebrow">Create in Termius</p>
+    <h2>Once per snippet, five taps.</h2>
+    <ol class="steps">
+      <li><strong>Snippets</strong> tab → tap <strong>+</strong>.</li>
+      <li>Name it (use the labels below).</li>
+      <li>Paste the script. Tap the <strong>Copy</strong> button here, then <strong>⌘V</strong> in the Script field.</li>
+      <li>Save.</li>
+      <li>To fire: open the snippet → <strong>Run</strong> or <strong>Send to host</strong> → pick your <strong>Ensemble Mac</strong> host.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="durations">
+  <div class="wrap">
+    <p class="eyebrow">Duration presets</p>
+    <h2>Default mission: top recommendation.</h2>
+    <p class="lead">Three generic durations that fire a bounded autopilot session. The agent reads its state files, picks the current top recommendation, works within budget.</p>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Auto 10 min</div>
+        <div class="snip-tag">quick win</div>
+      </div>
+      <div class="snip-desc">Short focused run. Good for one small polish task.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 10</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Auto 30 min</div>
+        <div class="snip-tag">standard</div>
+      </div>
+      <div class="snip-desc">Default workhorse. Picks current top recommendation, works to completion within budget.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 30</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Auto 60 min</div>
+        <div class="snip-tag">deep</div>
+      </div>
+      <div class="snip-desc">Longer dive — multi-file feature or substantive doc work.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 60</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="missions">
+  <div class="wrap">
+    <p class="eyebrow">Themed missions</p>
+    <h2>Custom prompt, timed.</h2>
+    <p class="lead">Each one instructs the agent to work a specific kind of task, bounded in time. Safety rails still apply — local commits only, never pushes.</p>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Docs Polish — 15 min</div>
+        <div class="snip-tag">prose</div>
+      </div>
+      <div class="snip-desc">Pick one <code>.md</code> file in <code>docs/</code>; polish typography, fix broken links, tighten prose. One small commit.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 15 "Read docs/*.md. Pick one file that would benefit most from a polish pass. Fix typography, broken internal links, grammar slips, and tighten prose surgically. Commit once with [autopilot] prefix. Never push."</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>README Sweep — 20 min</div>
+        <div class="snip-tag">metadata</div>
+      </div>
+      <div class="snip-desc">Refresh README.md files to reflect current commit state. Surgical, one commit per file.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 20 "Read README.md at repo root, plugins/ensemble/README.md, and plugins/ensemble/bootstraps/README.md. Update claims, command examples, and file refs to match current repo state (check git log for recent changes). Surgical edits only. One commit per file. Never push."</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>TODO Closer — 30 min</div>
+        <div class="snip-tag">code</div>
+      </div>
+      <div class="snip-desc">Grep for <code>TODO</code>/<code>FIXME</code>; pick one; close it properly with an implementation.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 30 "Grep the repo for TODO and FIXME comments (exclude .git, node_modules, research/). Pick ONE that is bounded, clear, and closable in 25 minutes. Implement the fix, remove the comment, commit with [autopilot] prefix. Log your choice + reasoning in the run log. Never push."</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Cleanup Sweep — 15 min</div>
+        <div class="snip-tag">hygiene</div>
+      </div>
+      <div class="snip-desc">Trailing whitespace, obvious dead code, inconsistent formatting. <strong>No refactors, no logic changes.</strong></div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh fire 15 "Scan bin/*.sh and plugins/ensemble/bin/*.sh for: trailing whitespace, obvious dead commented code (not deliberate comments), inconsistent indentation. Fix surgically. One commit. NO refactors, NO logic changes. Never push."</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ops">
+  <div class="wrap">
+    <p class="eyebrow">Ops snippets</p>
+    <h2>Instant — no autopilot.</h2>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Status</div>
+        <div class="snip-tag">instant</div>
+      </div>
+      <div class="snip-desc">One-line snapshot: mode, lock state, runs today, dispatches today.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh status</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Brief</div>
+        <div class="snip-tag">instant</div>
+      </div>
+      <div class="snip-desc">Today's morning briefing, if one exists. Cross-project top recs.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh brief</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+
+    <div class="snip kill">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>KILL — emergency stop</div>
+        <div class="snip-tag">panic</div>
+      </div>
+      <div class="snip-desc">Releases the autopilot lock immediately, kills any in-flight session, drops the kill-switch signal for the Maestro's shutdown cascade. Safe to tap anytime.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">bash ~/.claude/orchestrator/bin/mobile_dispatch.sh kill</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="wrap">
+    <p class="eyebrow">Safety</p>
+    <h2>Guaranteed — you don't enforce them.</h2>
+    <table class="rules">
+      <tbody>
+        <tr><td>No <code>git push</code></td><td>Prompt explicitly forbids it. <code>safety_constraints.md</code> enforces at a higher level. Never included in the default prompt.</td></tr>
+        <tr><td>No deploys</td><td>Same — prompt + <code>safety_constraints.md</code>.</td></tr>
+        <tr><td>Local commits only</td><td>All commits use <code>[autopilot]</code> prefix. Push requires explicit in-chat approval from a Maestro or Agent session later.</td></tr>
+        <tr><td>Hard duration ceiling</td><td><code>gtimeout (N+2)m</code> wrapper kills the session if it overruns. N is the minutes you fired.</td></tr>
+        <tr><td>Mode gate</td><td>Aborts cleanly if <code>state.json.mode ≠ orchestrated</code>.</td></tr>
+        <tr><td>Lock conflict gate</td><td>Aborts cleanly if another autopilot is already holding the lock.</td></tr>
+        <tr><td>Post-mortem log</td><td>Every run writes to <code>~/.claude/orchestrator/runs/autopilot-&lt;stamp&gt;.md</code> + <code>.raw.log</code>.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>The phone is the trigger, not the worker.</strong> Your phone just sends a ~100-byte SSH command and gets a one-line acknowledgment. All the work runs on your Mac. Battery-cheap, data-cheap, latency &lt; 1s over Tailscale.</div>
+  </div>
+</section>
+
+<section id="check">
+  <div class="wrap">
+    <p class="eyebrow">Check results</p>
+    <h2>On the Mac, afterward.</h2>
+    <div class="snip">
+      <div class="snip-head">
+        <div class="snip-title"><span class="bullet"></span>Inspect the latest run</div>
+        <div class="snip-tag">Mac Terminal</div>
+      </div>
+      <div class="snip-desc">See what the most recent autopilot session did, plus any new commits it landed.</div>
+      <div class="snip-cmd-row">
+        <pre class="snip-cmd">cd ~/.claude/orchestrator
+ls -lat runs/ | head -5
+cat runs/$(ls -t runs/autopilot-*.md | head -1 | xargs basename)
+git log --oneline -5</pre>
+        <button class="snip-copy" type="button">Copy</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="trouble">
+  <div class="wrap">
+    <p class="eyebrow">Troubleshooting</p>
+    <h2>The three quickest fixes.</h2>
+    <table class="rules">
+      <tbody>
+        <tr><td>"Connection refused"</td><td>Mac is asleep. Open the lid, or start an Amphetamine indefinite session before leaving home.</td></tr>
+        <tr><td>"Permission denied (publickey)"</td><td>SSH key mismatch. In Termius: Host → edit → ensure your <code>ensemble_phone</code> key is selected.</td></tr>
+        <tr><td>"lock: HELD" forever</td><td>Fire the <strong>KILL</strong> snippet. Releases the lock immediately + kills any hung autopilot.</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:16px;">Anything else — check <code>~/.claude/orchestrator/mobile_dispatch.log</code> and the relevant <code>runs/autopilot-*.raw.log</code> for the exact error text.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Host: Tailscale <code>100.107.120.85</code> (<code>kevin@Kevins-MacBook-Pro</code>)<br>
+      Scripts: <code>~/.claude/orchestrator/bin/mobile_dispatch.sh</code> + <code>autopilot_session.sh</code><br>
+      Kill anytime with the red snippet above, or by closing the lid without Amphetamine.
+    </p>
+  </div>
+</footer>
+
+<div class="copy-live" id="copyLive" aria-live="polite"><div class="pill">Copied ✓</div></div>
+
+<script>
+(function () {
+  var live = document.getElementById('copyLive');
+  var liveTimer = null;
+  function flashLive() {
+    live.classList.add('show');
+    if (liveTimer) clearTimeout(liveTimer);
+    liveTimer = setTimeout(function () { live.classList.remove('show'); }, 1400);
+  }
+
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('.snip-copy');
+    if (!btn) return;
+    var row = btn.closest('.snip-cmd-row');
+    var cmd = row && row.querySelector('.snip-cmd');
+    if (!cmd) return;
+    var text = cmd.textContent || '';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        btn.classList.add('ok');
+        var prev = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        flashLive();
+        setTimeout(function () {
+          btn.classList.remove('ok');
+          btn.textContent = prev;
+        }, 1400);
+      }).catch(function () {
+        fallbackCopy(text, btn);
+      });
+    } else {
+      fallbackCopy(text, btn);
+    }
+  });
+
+  function fallbackCopy(text, btn) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); btn.classList.add('ok'); btn.textContent = 'Copied ✓'; flashLive(); setTimeout(function(){ btn.classList.remove('ok'); btn.textContent = 'Copy'; }, 1400); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+
+</body>
+</html>
